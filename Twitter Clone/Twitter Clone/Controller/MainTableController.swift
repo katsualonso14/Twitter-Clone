@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class MainTableController: UITabBarController {
 //ボタンの作成
@@ -23,15 +24,49 @@ class MainTableController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        configureViewControllers()
-        configureUI()
+        view.backgroundColor = .twitterBlue
+//        logUserOut()
+        authenticateUserAndConfigureUI()
+        
+    }
+//    MARK: - API
+    
+    func fetchUser() {
+        UserService.shared.fetchUser()
+    }
+//    サインインしているかどうかのprint
+    func authenticateUserAndConfigureUI() {
+        if Auth.auth().currentUser == nil {
+//            サインインしてない場合は、ログインコントローラーを提示
+            DispatchQueue.main.async {
+                let nav = UINavigationController(rootViewController: LoginController())
+                nav.modalPresentationStyle = .fullScreen
+                self.present(nav, animated: true,completion: nil)
+            }
+        } else {
+           configureViewControllers()
+            configureUI()
+            fetchUser()
+        }
+    }
+//    ログアウトする関数
+    func logUserOut() {
+        do {
+            try Auth.auth().signOut()
+            print("DEBUG: Did log user out..")
+        } catch let error {
+            print("DEBUG: Failed to sign out with eroor \(error.localizedDescription)")
+        }
+        
     }
     
+//    MARK: -Selerotors
 //    タッチしたときの関数
     @objc func actionButtonTapped() {
         print(123)
     }
     
+//    MARK: - Helpers
 //    ボタンの設定に関する関数
     func configureUI() {
         view.addSubview(actionButton)

@@ -80,7 +80,24 @@ class LoginController: UIViewController {
     }
 //    ログインボタン押した時の関数
     @objc func handelLogin() {
-        print("Handle login here..")
+        guard let email = emaiTextField.text else {return}
+        guard let password = passwordTextField.text else {return}
+        
+        AuthService.shared.logUserIn(withEmail: email, password: password) {(retuls,error) in
+            if let error = error {
+                print("DEBUG: Error loging in \(error.localizedDescription)")
+                return
+            }
+            
+//            メインタブの実装
+            guard let window = UIApplication.shared.windows.first(where: {$0.isKeyWindow}) else {return}
+            
+            guard let tab = window.rootViewController as? MainTableController else {return}
+            
+            tab.authenticateUserAndConfigureUI()
+            
+            self.dismiss(animated: true, completion: nil)
+        }
     }
     
 //    MARK: - Helpers
