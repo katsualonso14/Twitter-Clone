@@ -7,6 +7,7 @@
 //
 
 import Firebase
+//設定
 
 let STORAGE_REF = Storage.storage().reference()
 let STORAGE_PROFILE_IMAGES = STORAGE_REF.child("profile_images")
@@ -15,3 +16,4 @@ let STORAGE_PROFILE_IMAGES = STORAGE_REF.child("profile_images")
 let DB_REF = Database.database().reference()
 //データベースのusersの定数
 let REF_USERS = DB_REF.child("users")
+let RER_TWEETS = DB_REF.child("tweets")

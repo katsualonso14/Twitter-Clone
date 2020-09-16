@@ -10,6 +10,19 @@ import UIKit
 import Firebase
 
 class MainTableController: UITabBarController {
+    
+//    MARK: -Prpoeries
+    
+//    ユーザーの動き
+    var user: User? {
+        didSet {
+            guard let nav = viewControllers?[0] as? UINavigationController else {return}
+            guard let feed = nav.viewControllers.first as? FeedContoller else {return}
+            
+            feed.user = user
+        }
+    }
+    
 //ボタンの作成
     let  actionButton: UIButton = {
     let button = UIButton(type: .system)
@@ -31,8 +44,11 @@ class MainTableController: UITabBarController {
     }
 //    MARK: - API
     
+//    ユーザーの設定
     func fetchUser() {
-        UserService.shared.fetchUser()
+        UserService.shared.fetchUser{user in
+            self.user = user
+        }
     }
 //    サインインしているかどうかのprint
     func authenticateUserAndConfigureUI() {
@@ -61,9 +77,14 @@ class MainTableController: UITabBarController {
     }
     
 //    MARK: -Selerotors
-//    タッチしたときの関数
+//   新しいツイートするボタンを押したときの関数
     @objc func actionButtonTapped() {
-        print(123)
+        guard let user = user else {return}
+        
+        let controller = UploadTweetController(user: user)
+       let nav = UINavigationController(rootViewController: controller)
+        nav.modalPresentationStyle = .fullScreen //フル画面でpresent
+        present(nav, animated: true,completion: nil)
     }
     
 //    MARK: - Helpers
