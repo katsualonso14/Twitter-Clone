@@ -15,17 +15,17 @@ struct UserService {
     static let shared = UserService()
 
 //現在のユーザに関する情報のFirebaseからの所得
-    func fetchUser(completion: @escaping(User) -> Void) {
+    func fetchUser(uid: String,completion: @escaping(User) -> Void) {
     guard let uid = Auth.auth().currentUser?.uid else {return}
     
     REF_USERS.child(uid).observeSingleEvent(of: .value) { snapshot in
         guard let dictionary = snapshot.value as? [String: AnyObject] else {return}
       
-//        ユーザー情報の取得
+        //        ユーザー情報の取得
         let user = User(uid: uid, dictionary: dictionary)
         
-completion(user)
+        completion(user)
     }
-  }
-
+    }
+    
 }

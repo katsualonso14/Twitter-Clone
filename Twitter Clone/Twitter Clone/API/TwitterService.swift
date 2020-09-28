@@ -18,10 +18,28 @@ struct TweetService {
         let value = ["uid": uid, "timestamp": Int(NSDate().timeIntervalSince1970),
                      "likes": 0,
                      "retweet": 0,
-                     "caotion": caption] as [String: Any]
+                     "caption": caption] as [String: Any]
         
         RER_TWEETS.childByAutoId().updateChildValues(value,withCompletionBlock: competion)
         
     }
     
+    func fetchTweets(completion: @escaping([Tweet]) -> Void) {
+    var tweets = [Tweet]()
+        
+        RER_TWEETS.observe(.childAdded) { snapshot in
+            
+            guard let dictionary = snapshot.value as? [String: Any] else {return}
+            guard let uid = dictionary["uid"] as? String else {return}
+            
+            let tweetID = snapshot.key
+           
+            //各ユーザーのための設定
+            UserService.shared.fetchUser(uid: uid) { user in
+                let tweet = Tweet(user: user, tweetID: tweetID,dictionary: dictionary)
+                tweets.append(tweet)
+                completion(tweets)
+            }
+        }
+    }
 }

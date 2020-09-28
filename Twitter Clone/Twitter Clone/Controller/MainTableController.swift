@@ -46,7 +46,8 @@ class MainTableController: UITabBarController {
     
 //    ユーザーの設定
     func fetchUser() {
-        UserService.shared.fetchUser{user in
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        UserService.shared.fetchUser(uid: uid){user in
             self.user = user
         }
     }
@@ -105,7 +106,7 @@ class MainTableController: UITabBarController {
     
     func configureViewControllers() {
 //        それぞれ関数（navigationBarの）に当てはめていく
-        let feed = FeedContoller()
+        let feed = FeedContoller(collectionViewLayout: UICollectionViewFlowLayout())
         let nav1 = tamplateNavigationController(image: UIImage(named: "home_unselected"), rootViewConroller: feed)
 
         let explore = ExploreContoller()

@@ -9,7 +9,9 @@
 import UIKit
 import SDWebImage
 
-class FeedContoller: UIViewController {
+private let reuseIdentifirer = "TweetCell"
+
+class FeedContoller: UICollectionViewController {
     
 //    MARK: - Properties
 //    ユーザーなら設定した画像を実装させる
@@ -19,17 +21,35 @@ configureLeflBarButton()
         }
     }
     
+    private var tweets = [Tweet]() {
+        didSet { collectionView.reloadData()}
+        //データを読み取る　このコードでデータが反映
+    }
+    
 //    MARK: - Lifecycle
     override func viewDidLoad() {
          super.viewDidLoad()
 
         confifureUI()
+        fetchTweet()
      }
+    
+    //MARK: - API
+    
+    func fetchTweet() {
+        TweetService.shared.fetchTweets{ tweets in
+            self.tweets = tweets  //ツイートカウントのための宣言
+        }
+    }
     
 //    MARK: - Helpes
     
     func confifureUI() {
         view.backgroundColor = .white
+        
+        collectionView.register(TweetCell.self, forCellWithReuseIdentifier: reuseIdentifirer)//ツイートセルを受け継ぐ
+        collectionView.backgroundColor = .white
+        
         
         let imageView = UIImageView(image: UIImage(named: "twitter_logo_blue"))
         imageView.contentMode = .scaleAspectFit
@@ -53,4 +73,34 @@ configureLeflBarButton()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: profileImageView)
     }
     
+}
+
+//MARK: UICollectionViewDdelegate/DataSource
+
+//　FeedControllerの拡張子
+
+extension FeedContoller {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return tweets.count //　データベースにあるだけ
+    }
+    
+    //cellの内容
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell =  collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifirer, for: indexPath) as! TweetCell//再利用識別子
+        
+        cell.tweet = tweets[indexPath.row]
+        
+        return cell
+    }
+}
+
+//MARK: UICollectionViewDdelegateFlowLayout
+
+
+extension FeedContoller: UICollectionViewDelegateFlowLayout {
+    
+    //サイズ
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: view.frame.width, height: 120)
+    }
 }
